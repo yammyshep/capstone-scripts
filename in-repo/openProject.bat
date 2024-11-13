@@ -1,6 +1,6 @@
 @echo off
 
-SET UE_VERSION=5.2
+SET UE_VERSION=5.4
 
 pushd %~dp0
 SET "REPO_ROOT=%CD%"
@@ -13,8 +13,14 @@ svn update "%REPO_ROOT%"
 
 
 REM Fetch the root of the Unreal Engine installation directory from the registry
-FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CURRENT_USER\SOFTWARE\Epic Games\Unreal Engine\Builds" /v %UE_VERSION%`) DO (
+FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CURRENT_USER\SOFTWARE\Epic Games\Unreal Engine\Builds" /v "%UE_VERSION%"`) DO (
     SET UE_ROOT=%%A %%B
+)
+
+IF NOT DEFINED UE_ROOT (
+    FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_LOCAL_MACHINE\SOFTWARE\EpicGames\Unreal Engine\%UE_VERSION%" /v "InstalledDirectory"`) DO (
+        SET UE_ROOT=%%A %%B
+    )
 )
 
 IF NOT DEFINED UE_ROOT (
